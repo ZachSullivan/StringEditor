@@ -58,140 +58,144 @@
 
     <script>
 
-        // Function Task: Take user input text string and convert every letter at predefined offsets to uppercase;
-        //
-        // Assumptions: Only ACSII letters [a-zA-Z] are valid for offset counting - all other ASCII numbers and
-        //              symbols are NOT countable;
-        //
-        // Description: Iterate thru the user input text string using each text character's ASCII value as an index
-        //              into the pre-defined ASCII State Table. Each table entry represents a unique ASCII value in
-        //              the range from 0 - 127 and holds one of three state values:
-        //              (1) TRUE - character is a lowercase letter hence countable and convertable to uppercase;
-        //              (2) FALSE - character is a uppercase letter hence countable but NOT convertable;
-        //              (3) SKIP - character is remaining ASCII number or symbol hence NOT countable nor convertable;
-        //
-        // Observations: (a) All logical per character outcomes are accounted for and logged to the runtime console;
-        //               (b) Should a character value when used as an index into the ASCII State Table extend beyond
-        //                   its valid range of 0 to 127 (decimal) a state of "NULL" is returned;
-        //               (c) When evaluating an ASCII character's state should an invalid or indeterminate state be
-        //                   detected then the condition is logged and the processing proceeds to the next string
-        //                   chsracter;
-        //
-        // Date: 2016-10-08  Z.Sullivan  [creation + initial test]
+	// Function Task: Take user input text string and convert every letter at predefined offsets to uppercase;
+	//
+	// Assumptions: Only ACSII (UTF-8) letters [a-zA-Z] are valid for offset counting - all other ASCII numbers and
+	//                        symbols are NOT countable;
+	//
+	// Description: Iterate thru the user input text string using each text character's ASCII value as an index
+	//                     into the pre-defined ASCII State Table (n.b. tradeoff between code execution time and table
+	//                     memory space). Each state table entry represents a unique ASCII value in the range from
+	//                     0 - 127 and holds one of three state values:
+	//                     (1) TRUE - character is a lowercase letter hence countable and convertable to uppercase;
+	//                     (2) FALSE - character is a uppercase letter hence countable but NOT convertable;
+	//                     (3) SKIP - character is remaining ASCII number or symbol hence NOT countable nor convertable;
+	//
+	// Observations: (a) All logical per character outcomes are accounted for and logged to the runtime console;
+	//                        (b) Should a character value when used as an index into the ASCII State Table extend beyond
+	//                              its valid range of 0 to 127 (decimal) a state of "NULL" is returned;
+	//                        (c) When evaluating an ASCII character's state should an invalid or indeterminate state be
+	//                             detected then the condition is logged and the processing proceeds to the next string
+	//                             character;
+	//
+	// Date: 2016-10-08  Z.Sullivan  [creation + initial test]
 
-        function processCase(){
+	function processCase(){
 
-            const SWITCHCASE_OFFSET = 4;  // Uppercase every SWITCHCASE_OFFSET letter (note: N-1) of the string 
+		const SWITCHCASE_OFFSET = 4;  // Uppercase every SWITCHCASE_OFFSET letter (note: N-1) of the string 
 
-            // Obtain the user input string, mapping it to a local variable
-            var string = document.getElementById( 'inputString' ).value;
-            // Split string into array of distinct characters
-            string = string.split( "" );
-            // Keep a count of displayable ASCII characters to determine which to captialize, initialize to zero
-            var asciiCounter = 0;
+		// Obtain the user input string, mapping it to a local variable
+		var string = document.getElementById( 'inputString' ).value;
+		// Split string into array of distinct characters
+		string = string.split( "" );
+		// Keep a count of displayable ASCII characters to determine which to captialize, initialize to zero
+		var asciiCounter = 0;
 
-            // Start iterating thru user input text string
-            for ( i = 0; i < string.length; i++ ) {
+		// Start iterating thru user input text string
+		for ( i = 0; i < string.length; i++ ) {
 
-                // Test each input character via ASCII state table to see if it's convertable or not or skippable
-                if ( checkAsciiState( string[i].charCodeAt(0) ) == 'TRUE' ) {
-                    console.log( "Char State at string[", i, "] =", string[i], "is Countable & lowercase letter" );
+			// Test each input character value via ASCII state table to see if it's convertable or not or skipable
+			var charState =  checkAsciiState( string[i].charCodeAt() ); 
+			switch(charState){
+			case 'TRUE':
+				console.log( "Char State at string[", i, "] =", string[i], "is Countable & lowercase letter" );
 
-                    // Note: asciiCounter starts at zero, test to convert case every SWITCHCASE-OFFSET characters
-                    if ( asciiCounter == SWITCHCASE_OFFSET ) {
+				// Note: asciiCounter starts at zero, test to convert case every SWITCHCASE-OFFSET characters
+				if ( asciiCounter == SWITCHCASE_OFFSET ) {
 
-                        // if this is SWITCHCASE_OFFSET char then convert to UpperCase and overwrite string index
-                        string[i] = string[i].toUpperCase();
-                        console.log( "-> Char is letter at SWITCHCASE_OFFSET and is converted" );
+					// this is SWITCHCASE_OFFSET char then convert to UpperCase and overwrite string index
+					string[i] = string[i].toUpperCase();
+					console.log( "-> Char is letter at SWITCHCASE_OFFSET and is converted" );
 
-                        asciiCounter = 0;  // Reset the count of displayable ASCII characters
+					asciiCounter = 0;  // Reset the count of displayable ASCII characters
 
-                    } else {
-                        console.log( "-> Char is letter NOT at SWITCHCASE_OFFSET and is NOT converted" );
+				} else {
+					console.log( "-> Char is letter NOT at SWITCHCASE_OFFSET and is NOT converted" );
 
-                        asciiCounter += 1;  // Increment count Note: resulting char is unchanged at this string index
-                    }
+					asciiCounter += 1;  // Increment count Note: resulting char is unchanged at this string index
+				}
+				break;
 
-                } else if ( checkAsciiState( string[i].charCodeAt(0) ) == 'FALSE' ) {
-                    console.log( "Char State at string[", i, "] =", string[i], "is Countable but already Uppercase letter"  );
+			case 'FALSE':
+				console.log( "Char State at string[", i, "] =", string[i], "is Countable but already Uppercase letter"  );
 
-                    // Note: asciiCounter starts at zero, test to convert case every SWITCHCASE-OFFSET characters
-                    if ( asciiCounter == SWITCHCASE_OFFSET ) {
+				// Note: asciiCounter starts at zero, test to convert case every SWITCHCASE-OFFSET characters
+				if ( asciiCounter == SWITCHCASE_OFFSET ) {
 
-                        // If character is already Uppercase then just Reset the count of displayable ASCII characters
-                        console.log( "-> Char is NOT convertable letter and at SWITCHCASE_OFFSET -> IGNORE & Reset count" );
+					// If character is already Uppercase then just Reset the count of displayable ASCII characters
+					console.log( "-> Char is NOT convertable letter and at SWITCHCASE_OFFSET -> IGNORE & Reset count" );
 
-                        asciiCounter = 0;  // Reset the count of displayable ASCII characters
+					asciiCounter = 0;  // Reset the count of displayable ASCII characters
+				} else {
 
-                    } else {
+					// If this character is not covertable to UpperCase but countable, simply increment
+					console.log( "-> Char is NOT convertable letter and NOT at SWITCHCASE_OFFSET -- Increment count" );
 
-                        // If this character is not covertable to UpperCase but countable, simply increment
-                        console.log( "-> Char is NOT convertable letter and NOT at SWITCHCASE_OFFSET -- Increment count" );
+					asciiCounter += 1;  // Note: the character effectively unchanged at this 'i' string index
+				}
+				break;
 
-                        asciiCounter += 1;  // Note: the character effectively unchanged at this 'i' string index
-                    }
+			case 'SKIP':
+				// here we skip any ASCII characters that cannot be counted or displayed
+				console.log( "Char State at string[", i, "] =", string[i], "is NOT [a-zA-Z] letter -> SKIP" );
+				break;
 
-                } else if ( checkAsciiState( string[i].charCodeAt(0) ) == 'SKIP' ) {
+			default:
+				console.log( "Char State at string[", i, "] =", string[i].charCodeAt(), "is INVALID !! -> IGNORE" );
+				break;
+			}
+		}
 
-                    // here we skip any ASCII characters that cannot be counted or displayed
-                    console.log( "Char State at string[", i, "] =", string[i], "is NOT [a-zA-Z] letter -> SKIP" );
+		// Restitch the modified array of chars back into a string
+		string = string.join( "" );
+		// Output the modified string to the user
+		document.getElementById( "outputString" ).innerHTML = string; 
+	}
 
-                } else {
+        function checkAsciiState( index ) {
 
-                    console.log( "Char State at string[", i, "] =", string[i], "is INVALID !! -> IGNORE" );
-                }
-            }
+		const ASCII_TABLE_MIN = 0;
+		const ASCII_TABLE_MAX = 127;
 
-            // Restitch the modified array of chars back into a string
-            string = string.join( "" );
-            // Output the modified string to the user
-            document.getElementById( "outputString" ).innerHTML = string; 
-        }
+		// This State Table represents all 128 ASCII values and captures the state of each
+		// character as to whether it is capitalizable as in Countable & LowerCase (TRUE)
+		// or Countable & Uppercase (FALSE) or not Countable / not Displayable (SKIP)
+		var asciiStateTable = ["SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 0(NUL) - 4(EOT)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 5(ENQ) - 9(TAB)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 10(LF) - 14(SO)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 15(SI) - 19(DC3)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 20(DC4) - 24(CAN)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 25(EM) - 29(GS)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 30(RS) - 34(")
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 35(#) - 39(')
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 40(() - 44(.)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 45(-) - 49(1)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 50(2) - 54(6)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 55(7) - 59(;)
+						   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 60(<) - 64(@)
+						   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",	// ASCII values 65(A) - 69(E)
+						   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",	// ASCII values 70(F) - 74(J)
+						   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",	// ASCII values 75(K) - 79(O)
+						   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",	// ASCII values 80(P) - 84(T)
+						   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",	// ASCII values 85(U) - 89(Y)
+						   "FALSE", "SKIP", "SKIP", "SKIP", "SKIP",			// ASCII values 90(Z) - 94(^)
+						   "SKIP", "SKIP", "TRUE", "TRUE", "TRUE",			// ASCII values 95(_) - 99(c)
+						   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",		// ASCII values 100(d) - 104(h)
+						   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",		// ASCII values 105(i) - 109(m)
+						   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",		// ASCII values 110(n) - 114(r)
+						   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",		// ASCII values 115(s) - 119(w)
+						   "TRUE", "TRUE", "TRUE", "SKIP", "SKIP",			// ASCII values 120(x) - 124(|)
+						   "SKIP", "SKIP", "SKIP"];						// ASCII values 125(}) - 127(DEL)
 
-        function checkAsciiState(index) {
+		// Prior to accessing the ASCII State Table ensure the index variable fits within the range limits
+		if ( (index >= ASCII_TABLE_MIN) && (index <= ASCII_TABLE_MAX) ) {
+			return asciiStateTable[index];
+		} else {
+			console.log( "ASCII State Table index(", index, ") exceeds VALID range !!" );
+			return "NULL";
+		}
+	}
+	</script>
 
-            const ASCII_TABLE_MIN = 0;
-            const ASCII_TABLE_MAX = 127;
-
-            // This State Table represents all 128 ASCII values and captures the state of each
-            // character as to whether it is capitalizable as in Countable & LowerCase (TRUE)
-            // or Countable & Uppercase (FALSE) or not Countable / not Displayable (SKIP)
-            var asciiStateTable = ["SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 0(NUL) - 4(EOT)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 5(ENQ) - 9(TAB)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 10(LF) - 14(SO)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 15(SI) - 19(DC3)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 20(DC4) - 24(CAN)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 25(EM) - 29(GS)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 30(RS) - 34(")
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 35(#) - 39(')
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 40(() - 44(.)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 45(-) - 49(1)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 50(2) - 54(6)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 55(7) - 59(;)
-                                   "SKIP", "SKIP", "SKIP", "SKIP", "SKIP",       // ASCII values 60(<) - 64(@)
-                                   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",  // ASCII values 65(A) - 69(E)
-                                   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",  // ASCII values 70(F) - 74(J)
-                                   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",  // ASCII values 75(K) - 79(O)
-                                   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",  // ASCII values 80(P) - 84(T)
-                                   "FALSE", "FALSE", "FALSE", "FALSE", "FALSE",  // ASCII values 85(U) - 89(Y)
-                                   "FALSE", "SKIP", "SKIP", "SKIP", "SKIP",      // ASCII values 90(Z) - 94(^)
-                                   "SKIP", "SKIP", "TRUE", "TRUE", "TRUE",       // ASCII values 95(_) - 99(c)
-                                   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",       // ASCII values 100(d) - 104(h)
-                                   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",       // ASCII values 105(i) - 109(m)
-                                   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",       // ASCII values 110(n) - 114(r)
-                                   "TRUE", "TRUE", "TRUE", "TRUE", "TRUE",       // ASCII values 115(s) - 119(w)
-                                   "TRUE", "TRUE", "TRUE", "SKIP", "SKIP",       // ASCII values 120(x) - 124(|)
-                                   "SKIP", "SKIP", "SKIP"];                      // ASCII values 125(}) - 127(DEL)
-
-            // Prior to accessing the ASCII State Table ensure the index variable fits within the range limits
-            if ( (index >= ASCII_TABLE_MIN) && (index <= ASCII_TABLE_MAX) ) {
-                return asciiStateTable[index];
-            } else {
-                console.log( "ASCII State Table index(", index, ") exceeds VALID range !!" );
-                return "NULL";
-            }
-        }
-    </script>
-
-    </body>
+	</body>
 </html>
